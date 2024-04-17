@@ -24,11 +24,11 @@ def predict(day_of_week, time):
     return {'wait': wait_prediction}
 
 
-## http://127.0.0.1:8000/counttrees?lat=40.4248077&long=-3.6938166&step=1&api_key=XXXXXXXXXXXXXXXXXXXXx
+## http://127.0.0.1:8000/counttrees?lat=40.4248077&long=-3.6938166&step=0&api_key=XXXXXXXXXXXXXXXXXXXXx
 @app.get('/counttrees')
 def count_trees(lat, long, step, api_key):
 
-    trees_df, tree_img = get_all_trees(lat, long, step, api_key)
+    trees_df, tree_img = get_all_trees(float(lat), float(long), int(step), api_key)
 
     ## change DF into JSON
     trees_json = trees_df.to_json(orient='records')

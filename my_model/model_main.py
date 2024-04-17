@@ -65,21 +65,27 @@ def get_local_image(): ## TEMP ###
 
 def get_all_trees(lat, long, step, api_key):
     trees_all_df = pd.DataFrame()
-    tree_all_img = np.empty(shape=(TILE_SIZE, TILE_SIZE*(2*step+1)), dtype=int)
+    tree_all_img = np.empty(shape=(0), dtype=int)
 
     for y_step in np.arange(-step, step+1, 1):
 
-        tree_all_x_img = np.empty(shape=(TILE_SIZE, TILE_SIZE), dtype=int)
+        tree_all_x_img = np.empty(shape=(0), dtype=int)
         for x_step in np.arange(-step, step+1, 1):
             lat_step, lon_step = tile_coordinates(lat, long, IMG_ZOOM, x_step, y_step, TILE_SIZE)
             trees_df_step, tree_img_step = get_trees(lat_step, lon_step, api_key)
 
             tree_img_step_rgb = tree_img_step[:, :, ::-1]
-            tree_all_x_img = np.concatenate(tree_all_x_img, tree_img_step_rgb, axis=1)
+            if tree_all_x_img.size == 0:
+                tree_all_x_img = tree_img_step_rgb
+            else:
+                tree_all_x_img = np.concatenate([tree_all_x_img, tree_img_step_rgb], axis=1)
 
             trees_all_df = pd.concat([trees_all_df, trees_df_step], ignore_index=True)
 
-        tree_all_img = np.concatenate(tree_all_img, tree_all_x_img, axis=0)
+        if tree_all_img.size == 0:
+            tree_all_img = tree_all_x_img
+        else:
+            tree_all_img = np.concatenate([tree_all_img, tree_all_x_img], axis=0)
 
 
     return trees_all_df, tree_all_img
